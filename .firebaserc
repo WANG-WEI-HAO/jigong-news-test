@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "jigong-news-test",
+    "jigong-news-test": "jigong-news-test"
+  },
+  "targets": {},
+  "etags": {}
+}

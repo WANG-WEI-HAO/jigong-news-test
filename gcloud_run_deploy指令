@@ -1,0 +1,46 @@
+#部屬gcloud run jobs到雲端(先確認Dockerfile)
+# 使用 '--env-vars-file' 來管理大部分環境變數
+# 使用 '--set-secrets' 來管理超長/超敏感的變數
+gcloud run jobs deploy telegram-importer-job --source . --region us-central1 
+--set-env-vars 
+"TELEGRAM_API_ID=24497815,TELEGRAM_API_HASH=a97f0ae369dae84561e49303c377ced5,
+IMGBB_API_KEY=58342c11a0848b6e2ae760743bd54b44,CHANNEL_USERNAME=jigongnews,
+STORAGE_BUCKET_NAME=jigong-news-test.firebasestorage.app,
+CLOUD_FUNCTION_BASE_URL=https://us-central1-jigong-news-test.cloudfunctions.net/api,
+PWA_BASE_URL=https://jigong-news-test.web.app" 
+--set-secrets "/secrets/telegram-session=telegram-session-string:latest"
+
+
+  #終端機手動執行gcloud run jobs
+  gcloud run jobs execute telegram-importer-job --region us-central1
+
+  #終端機建立serets
+  gcloud secrets create telegram-session --data-file="/path/to/your/local/session.txt"
+
+  #建立映像檔
+  gcloud builds submit --tag gcr.io/jigong-news-test/telegram-importer:latest
+
+  #使用更新的 job.yaml 替換雲端上的 Job
+  gcloud run jobs replace job.yaml --region=us-central1
+
+  #終端機直接觸發job
+  gcloud run jobs execute telegram-importer-job
+
+  #建立排程
+ gcloud scheduler jobs create http daily-update-and-push \
+  --schedule="20 17 * * *" \
+  --time-zone="Asia/Taipei" \
+  --location="us-central1" \
+  --uri="https://us-central1-run.googleapis.com/apis/run.googleapis.com/v1/projects/jigong-news-test/locations/us-central1/jobs/telegram-importer-job:run" \
+  --http-method="POST" \
+  --oidc-service-account-email="512806994042-compute@developer.gserviceaccount.com" \
+  --description="每天下午 5:20 執行 telegram-importer-job 來更新內容並觸發推播。"
+
+  #執行 deploy_all.sh 腳本步驟
+  # 1.指向根目錄
+  cd ~/jigong-news-test
+  # 2.賦予腳本執行權限
+  chmod +x deploy_all.sh
+  # 3.執行 deploy_all.sh
+  ./deploy_all.sh
+  

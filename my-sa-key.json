@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "jigong-news-test",
+  "private_key_id": "0f2f416d3005e184e47ea93e17f9168f0cd89bcb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCjEZ68JMv02Gwz\noW3t1KShmXcS3Jvp8WpAZedtn6XSH3gGQ8fhnZTG5BTwgIaBkMwkNwMXt6TlLcQh\n3fBfOmlw0yoTux8YtOSSjMJ8dovzipkN9eJ5qtnsZ653y1vXzKmXIFMLOo458Nbj\nz3F1CBuhcoD9Y7GIO75r+cEqkWXSYX/556Xe7tGlho5hYiuKq79pHdp5N/gLYs8Q\nljssGmxGfHkG+vUQ2TEob4qJlx/90zioD93ki8PPVKRl56Wb5UTBvouKNF7lYeK8\nKovexRap4FErhSBmeUoNs87CXo53n2ZFnPdO9E/wgx/gJuIyxffiwSXdAILnWlFF\n19h+R8AfAgMBAAECgf9qgwWHJ+9+NQNTSFTgzPHgUriq9LcrcuAGMEB52ij1cgZP\nNdIiVSbqwn19LCz4T64sQp35X+hCpSIbjzc7jpBQoZ0RIahAaMLj0cQSh+50N27B\neMer+f8UxqRBLVx0qpU/6l0vL0cAI8+mj8aeKr/hfY3DYkiBWDuJAmKpxryEdkRh\n4/9QVEACF0esdmnTzjh9m+SOxesbIaqQIgRB8zED0Qp+e92iFv1L4imQZZlNEUgh\nLldzl9KRaBTncNjYTqHAoTSkLuPgpve/OG/ePug/vatdhunKoIf18iB+uebBLLZS\nzdEHYKpQY4nkBCUc/HkPn2PM5PIyuc2h3qxMVMUCgYEA1DagCwRZy5//pD9ru8K7\nJY0RFDDyXUOUTBYqRlDgPBOx9may7M9sDfbI/Rg0w4VkKqhd8ZEvf8oG28YHZums\nLCB7VHyycYZDgp8mAs/pIlBl8hkvFkBFDY8Jaeukna+x9K6AOVU+Z7T5M+tAqt/c\nO9A4NpuqB3lWE8nG3TTJNosCgYEAxLceV/GX/N2/HovGZ+apVl8Za18zfQCYSszM\n1Rekcy1rnSlD32V43pV3s8wq4ziI2FTwhKxBtdTWP5CIKGNAWWLbnFaCGQVF+uVJ\nXbooTNNml/4GALHJ4wRxLSiHr76EE4xC6VE5tfbH7s8yfcTg9rlDrcKZB7Mxns8h\nPtR6Yz0CgYAfisL9ADeMkYqA0kBkFwyUB0SrmJ7dh+bp7D16WBkMNO01r4wWsLnh\n1XWIUOm+yfvab04PUsIZn2Cnl+aPwFmr8WQDacloIEm2h4sxzc9cH1EXy/B4wTLC\nUilXCgRcv7mWob1DSE1PQtHriqMBAucMKOXCEB8Un09Q/6PES01BAwKBgQDEdERf\ne61YIXR+4wSQOzGeSncuXfMjwXZWLVXa8jOPuyqf19gqwEIHuKnE6/9g0NMJiTpy\npT0yhI47CPKRsx1Op4W/Cj3/Et8ig93TNtiMcQsie9Qu2V9P0t3cRX/Mqa1pgEhK\njo3eBckB2/cG15n7jGXkoFUH9ZN2kFEZWEWp2QKBgFiUi2Pb/2RwXT9z5rtA+Nyn\nhiv53VBQ/riTB9yYzfvpEh54SUTUi9xbaWONYPqeLq7DXqRhXhH49ICALLrlgwXg\n1FJZmugRmBSJCxgNLqcplUjcdrhRDbvBx19mwZrXhIMU6GbUiqesraEsFt6UCjsG\n9ItwG/itPJUGblFxUQae\n-----END PRIVATE KEY-----\n",
+  "client_email": "jigong-news-test@appspot.gserviceaccount.com",
+  "client_id": "100526204326210775091",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/jigong-news-test%40appspot.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

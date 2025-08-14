@@ -1,0 +1,28 @@
+{
+  "name": "濟公報",
+  "short_name": "濟公報",
+  "description": "崇德佛院濟公報，每日6:30更新(台灣時間UTC+8)，可安裝至桌面使用。",
+  "start_url": "/",  
+  "display": "fullscreen",
+  "background_color": "#f9f9f9",
+  "theme_color": "#5a4fcf",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/濟公報logo.png", 
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

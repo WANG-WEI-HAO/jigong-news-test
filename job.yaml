@@ -1,0 +1,40 @@
+# job.yaml (最终完整版)
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: telegram-importer-job
+spec:
+  template:
+    spec:
+      template:
+        spec:
+          containers:
+          # 使用我们之前建置的、固定的映像档路徑
+          - image: gcr.io/jigong-news-test/telegram-importer:latest
+            env:
+            - name: TELEGRAM_API_ID
+              value: '24497815'
+            - name: TELEGRAM_API_HASH
+              value: 'a97f0ae369dae84561e49303c377ced5'
+            - name: IMGBB_API_KEY
+              value: '58342c11a0848b6e2ae760743bd54b44'
+            - name: CHANNEL_USERNAME
+              value: 'jigongnews'
+            - name: 'jigong-news-test.firebasestorage.app'
+              value: 'jigong-news-test.firebasestorage.app'
+            - name: CLOUD_FUNCTION_BASE_URL
+              value: 'https://us-central1-jigong-news-test.cloudfunctions.net/api'
+            # 【关键】确保 PWA_BASE_URL 也被包含在内
+            - name: PWA_BASE_URL
+              value: 'https://jigong-news-test.web.app'
+            volumeMounts:
+            - name: secrets
+              mountPath: /secrets
+              readOnly: true
+          volumes:
+          - name: secrets
+            secret:
+              secretName: telegram-session-string # 您的 Secret 名称
+              items:
+              - key: latest
+                path: telegram-session

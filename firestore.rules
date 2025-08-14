@@ -1,0 +1,12 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /posts.json {
+      allow read: if true; // 允許公開讀取
+      allow write: if false; // 禁止寫入
+    }
+    match /{allPaths=**} {
+      allow read, write: if false; // 其他文件禁止讀寫
+    }
+  }
+}

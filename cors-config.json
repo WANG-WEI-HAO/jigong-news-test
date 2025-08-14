@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://jigong-news-test.web.app", "http://localhost:*", "http://127.0.0.1:*"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

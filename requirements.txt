@@ -1,0 +1,8 @@
+# requirements.txt (簡化版)
+
+# 核心功能
+telethon==1.36.0
+requests==2.32.3
+firebase-admin==7.1.0
+# 用於本地開發時讀取 .env 檔案
+python-dotenv==1.0.1

@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <!-- === 網頁基本設定 (Metadata) === -->
+  <meta charset="UTF-8" />
+  <title>濟公報(測試版)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#5a4fcf" />
+  <link rel="manifest" href="manifest.json">
+
+  <!-- === 外部 CSS 框架/函式庫 === -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+  <!-- === Favicon & PWA 相關標籤 === -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/濟公報logo.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="shortcut icon" href="icons/濟公報logo.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="濟公報">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-512.png">
+
+  <!--─ OG (Open Graph) 預覽設定 ─-->
+  <meta property="og:title" content="濟公報">
+  <meta property="og:description" content="崇德佛院濟公報，每日6:30更新(台灣時間UTC+8)，可安裝至桌面使用。">
+  <meta property="og:image" content="https://jigong-news-test.web.app/icons/icon-512.png">
+  <meta property="og:url" content="https://jigong-news-test.web.app/">
+
+  <!-- Google Analytics 設定 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5NV53SWK53"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-5NV53SWK53');
+  </script>
+
+  <!-- === 內嵌 CSS 樣式 (所有來自 style.css 的內容) === -->
+  <style>
+    /* 全局及基礎樣式 */
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #FDF8E8;
+      transition: background-color 0.3s, color 0.3s;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      color: #5a4fcf;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      animation: slideUp 0.8s ease-out forwards;
+      margin-right: 120px;
+      /* 為右上角按鈕留出空間 */
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    h1 .subtitle {
+      font-size: 0.6em;
+      font-weight: normal;
+      color: #666;
+      margin-left: 0.5em;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 15px 0;
+      margin-top: 20px;
+      border-top: 1px solid #e9ecef;
+      color: #6c757d;
+      font-size: 0.9em;
+    }
+
+    /* ===== 新增：頁首操作按鈕容器 ===== */
+    .header-actions {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      gap: 0.8rem;
+      /* 按鈕間距 */
+      z-index: 999;
+    }
+
+    .action-icon-btn {
+      background: none;
+      border: none;
+      font-size: 2em;
+      /* 放大設定齒輪圖標的大小，以匹配分享圖示放大後的大小 */
+      color: #5a4fcf;
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.2s ease;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      /* 更大的點擊區域，方便觸控 */
+      height: 44px;
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      /* 避免移動設備點擊閃爍 */
+    }
+
+    .action-icon-btn img {
+      width: 32px;
+      /* 放大圖標的大小 */
+      height: 32px;
+      /* 放大圖標的大小 */
+    }
+
+    .action-icon-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* 深色模式下圖示和文字顏色 */
+    body.dark-mode .action-icon-btn {
+      color: #bb86fc;
+      /* 設定齒輪顏色 */
+    }
+
+    body.dark-mode .action-icon-btn img {
+      filter: brightness(0) invert(1);
+      /* 反轉圖片顏色以適應深色背景 */
+    }
+
+    /* ===== 新增：分享浮動面板樣式 ===== */
+    #share-popover {
+      position: absolute;
+      /* 相對於最近的已定位父元素 */
+      top: 65px;
+      /* 按鈕高度 (44px) + 上方 padding (2rem=32px) + 一些間距 (大約 65px) */
+      right: 0;
+      /* 與header-actions容器的右邊對齊 */
+      width: 320px;
+      /* 固定寬度 */
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      z-index: 998;
+      /* 比設定面板低一層 */
+      display: none;
+      /* 預設隱藏 */
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      gap: 15px;
+      /* 內容間距 */
+      opacity: 0;
+      /* 用於動畫 */
+      transform: translateY(-10px);
+      /* 用於動畫 */
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      border: 1px solid #eee;
+      /* 輕微邊框 */
+    }
+
+    #share-popover.visible {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* --- 已移除: Popover 的小箭頭的 CSS (位於 #share-popover::before) --- */
+
+    #share-popover-qr {
+      width: 150px;
+      height: 150px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    #share-text-content {
+      background-color: #f7f7f7;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      color: #555;
+      white-space: pre-wrap;
+      /* 保留換行符 */
+      word-break: break-all;
+      /* 防止文字溢出容器 */
+      border: 1px solid #e0e0e0;
+      text-align: left;
+      width: 100%;
+      box-sizing: border-box;
+      /* 確保 padding 和 border 不會增加總寬度 */
+    }
+
+    #copy-share-text-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #5a4fcf;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    #copy-share-text-btn:hover {
+      background-color: #483dbb;
+    }
+
+    #copy-share-text-btn:active {
+      transform: scale(0.98);
+    }
+
+    #copy-share-text-btn.copied {
+      background-color: #28a745;
+    }
+
+    /* 複製成功狀態顏色 */
+
+    .social-share-links {
+      display: flex;
+      justify-content: center;
+      /* 使社交圖標居中 */
+      gap: 15px;
+      margin-top: 5px;
+    }
+
+    .social-share-links a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+    .social-share-links a:hover {
+      transform: scale(1.1);
+    }
+
+    .social-share-links img {
+      width: 40px;
+      /* 此處控制社群圖示的顯示大小，默認已設定為一致大小 */
+      height: 40px;
+      /* 此處控制社群圖示的顯示大小，默認已設定為一致大小 */
+    }
+
+    /* Share Popover 深色模式 */
+    body.dark-mode #share-popover {
+      background-color: #2c2c2c;
+      border: 1px solid #444;
+    }
+
+    /* --- 已移除: 深色模式下小箭頭的 CSS (位於 body.dark-mode #share-popover::before) --- */
+    body.dark-mode #share-popover-qr {
+      border-color: #555;
+    }
+
+    body.dark-mode #share-text-content {
+      background-color: #3a3a3a;
+      color: #e0e0e0;
+      border-color: #555;
+    }
+
+    body.dark-mode #copy-share-text-btn {
+      background-color: #bb86fc;
+      color: #121212;
+    }
+
+    body.dark-mode #copy-share-text-btn:hover {
+      background-color: #a76bfa;
+    }
+
+    body.dark-mode #copy-share-text-btn.copied {
+      background-color: #03dac6;
+      color: #000;
+    }
+
+    body.dark-mode .social-share-links img {
+      filter: brightness(0.9);
+    }
+
+    /* 深色模式下微調社交圖標亮度 */
+
+    /* Share Popover RWD for mobile */
+    @media (max-width: 768px) {
+      h1 {
+        margin-right: 0;
+      }
+
+      /* 手機版標題不讓出空間 */
+
+      .header-actions {
+        right: 1rem;
+        top: 1rem;
+      }
+
+      /* 手機版邊距微調 */
+
+      #share-popover {
+        position: fixed;
+        /* 手機版改為固定定位 */
+        top: 5.5rem;
+        /* 距離頂部一些 */
+        left: 50%;
+        /* 水平居中 */
+        transform: translateX(-50%);
+        /* 水平居中 */
+        width: 90vw;
+        /* 寬度調整為螢幕的90% */
+        max-width: 380px;
+        /* 設定最大寬度，防止在大平板上過寬 */
+        transform: translateY(-10px) translateX(-50%);
+        /* 修正初始 transform */
+      }
+
+      #share-popover.visible {
+        transform: translateY(0) translateX(-50%);
+        /* 修正顯示時 transform */
+      }
+
+      /* --- 已移除: RWD 手機版小箭頭的 CSS (位於 #share-popover::before) --- */
+    }
+
+
+    /* 文章卡片樣式 */
+    .post {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .post:active {
+      transform: scale(0.98);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .date {
+      font-size: 0.9em;
+      color: #888;
+    }
+
+    .text {
+      margin-top: 0.5em;
+    }
+
+    img {
+      max-width: 100%;
+      margin-top: 1em;
+      border-radius: 6px;
+      cursor: pointer;
+      /* 已從 zoom-in 修改為 pointer */
+    }
+
+    .input-row {
+      display: flex;
+      gap: 1em;
+      margin-bottom: 2em;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #search,
+    #datePicker {
+      padding: 0.5em;
+      width: 180px;
+      max-width: 100%;
+      font-size: 1em;
+      margin-bottom: 0;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.2s;
+    }
+
+    #search:focus,
+    #datePicker:focus {
+      border-color: #5a4fcf;
+      outline: none;
+    }
+
+    #loadMoreBtn {
+      display: none;
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      background: #5a4fcf;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 1em auto;
+      transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    }
+
+    #loadMoreBtn:active {
+      transform: scale(0.95);
+      background-color: #483dbb;
+    }
+
+    .reset-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5em;
+      color: #5a4fcf;
+      padding: 0.2em 0.5em;
+      border-radius: 4px;
+      transition: background 0.2s, transform 0.2s ease-in-out;
+    }
+
+    .reset-btn:hover {
+      background: #ecebfa;
+    }
+
+    .reset-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* --- 深色模式 (黑色紫色主題) 樣式 --- */
+    body.dark-mode {
+      background: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .post {
+      background: #1e1e1e;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      border: 1px solid #333;
+    }
+
+    body.dark-mode .date {
+      color: #aaa;
+    }
+
+    body.dark-mode h1 {
+      color: #bb86fc;
+    }
+
+    body.dark-mode h1 .subtitle {
+      color: #aaa;
+    }
+
+    body.dark-mode input,
+    body.dark-mode #search,
+    body.dark-mode #datePicker {
+      background: #2c2c2c;
+      color: #e0e0e0;
+      border-color: #444;
+    }
+
+    body.dark-mode #loadMoreBtn {
+      background: #3700b3;
+    }
+
+    body.dark-mode .reset-btn {
+      color: #bb86fc;
+    }
+
+    body.dark-mode .reset-btn:hover {
+      background: #333;
+    }
+
+    /* 設定按鈕因為是 action-icon-btn, 顏色會被 .action-icon-btn 的 dark mode 規則覆蓋 */
+
+    body.dark-mode .footer {
+      border-top-color: #333;
+      color: #888;
+    }
+
+    /* === 圖片放大模態視窗樣式 (UI/UX 修正版) === */
+    #imageModal {
+      display: none;
+      position: fixed;
+      z-index: 10001;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #imageModal img {
+      max-width: 85vw;
+      max-height: 85vh;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      margin: auto;
+      flex-shrink: 0;
+    }
+
+    #modalCloseBtn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      color: white;
+      background-color: rgba(30, 30, 30, 0.6);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 1;
+      z-index: 10003;
+      opacity: 0.7;
+      transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    #modalCloseBtn:hover {
+      opacity: 1;
+      background-color: rgba(0, 0, 0, 0.7);
+      transform: scale(1.1);
+    }
+
+    #modalCloseBtn:active {
+      transform: scale(0.95);
+    }
+
+    .modal-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      background-color: rgba(30, 30, 30, 0.6);
+      border: none;
+      cursor: pointer;
+      z-index: 10003;
+      opacity: 0.7;
+      transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .modal-nav-btn:hover {
+      opacity: 1;
+      background-color: rgba(0, 0, 0, 0.7);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .modal-nav-btn:active {
+      transform: translateY(-50%) scale(1);
+    }
+
+    .modal-nav-btn svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    #modalPrevBtn {
+      left: 1rem;
+    }
+
+    #modalNextBtn {
+      right: 1rem;
+    }
+
+    .modal-nav-btn.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #shareButtonsContainer {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      background-color: rgba(30, 30, 30, 0.7);
+      padding: 0.5rem;
+      border-radius: 50px;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 10002;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      transform: translate(-50%, 10px);
+    }
+
+    #shareButtonsContainer.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%);
+    }
+
+    #shareButtonsContainer button,
+    #shareButtonsContainer a {
+      background-color: transparent;
+      color: #f0f0f0;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      transition: background-color 0.2s, transform 0.1s;
+      padding: 0;
+    }
+
+    #shareButtonsContainer button:active,
+    #shareButtonsContainer a:active {
+      transform: scale(1);
+    }
+
+    #shareButtonsContainer .share-btn-icon {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      #imageModal img {
+        max-width: 90vw;
+        max-height: 75vh;
+      }
+
+      #modalCloseBtn {
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+      }
+
+      .modal-nav-btn {
+        width: 40px;
+        height: 40px;
+      }
+
+      .modal-nav-btn svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      #modalPrevBtn {
+        left: 10px;
+      }
+
+      #modalNextBtn {
+        right: 10px;
+      }
+
+      #shareButtonsContainer {
+        bottom: 1rem;
+        padding: 0.4rem;
+        gap: 0.4rem;
+      }
+
+      #shareButtonsContainer button,
+      #shareButtonsContainer a {
+        width: 38px;
+        height: 38px;
+      }
+
+      #shareButtonsContainer .share-btn-icon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    /* --- 設定面板及開關樣式 --- */
+    .settings-button {
+      /* 不再是固定定位，改為 header-actions 的 flex item */
+      position: relative;
+      /* 只是為了重置以前的 fixed */
+      font-size: 1.8em;
+      z-index: auto;
+      /* 也由 header-actions 決定 */
+    }
+
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100%;
+      background-color: #f8f9fa;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+      z-index: 10000;
+      transition: right 0.3s ease-out;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.dark-mode .settings-panel {
+      background-color: #2c2c2c;
+      color: #f0f0f0;
+      box-shadow: -5px 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .settings-panel.is-open {
+      right: 0;
+    }
+
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    body.dark-mode .settings-header {
+      border-bottom-color: #495057;
+    }
+
+    .settings-header h2 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    .settings-content {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    body.dark-mode .setting-item {
+      border-bottom-color: #495057;
+    }
+
+    .setting-item label {
+      font-size: 1.2em;
+      font-weight: bold;
+      white-space: nowrap;
+      margin-right: 15px;
+    }
+
+    .action-button {
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      border: none;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    .action-button:active {
+      transform: scale(0.95);
+    }
+
+    .action-button {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .action-button:hover {
+      background-color: #218838;
+    }
+
+    #clear-cache-btn {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    #clear-cache-btn:hover {
+      background-color: #e0a800;
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 2em;
+      color: #6c757d;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 5px;
+      transition: color 0.2s, transform 0.2s ease-in-out;
+    }
+
+    .close-button:hover {
+      color: #343a40;
+    }
+
+    .close-button:active {
+      transform: scale(0.9);
+    }
+
+    body.dark-mode .close-button {
+      color: #adb5bd;
+    }
+
+    body.dark-mode .close-button:hover {
+      color: #f8f9fa;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-out;
+    }
+
+    .overlay.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 120px;
+      height: 40px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch-checkbox {
+      display: none;
+    }
+
+    .toggle-switch-label {
+      display: block;
+      overflow: hidden;
+      cursor: pointer;
+      border-radius: 20px;
+      background-color: #ccc;
+      transition: background-color 0.3s ease;
+    }
+
+    body.dark-mode .toggle-switch-label {
+      background-color: #555;
+    }
+
+    .toggle-switch-checkbox:checked+.toggle-switch-label {
+      background-color: #28a745;
+    }
+
+    #themeToggleSwitch:checked+.toggle-switch-label {
+      background-color: #bb86fc;
+    }
+
+    body.dark-mode #themeToggleSwitch:checked+.toggle-switch-label {
+      background-color: #bb86fc;
+    }
+
+    .toggle-switch-inner {
+      display: block;
+      width: 200%;
+      margin-left: -100%;
+      transition: margin 0.3s ease;
+    }
+
+    .toggle-switch-inner:before,
+    .toggle-switch-inner:after {
+      display: block;
+      float: left;
+      width: 50%;
+      height: 40px;
+      padding: 0;
+      line-height: 40px;
+      font-size: 16px;
+      color: white;
+      font-weight: bold;
+      box-sizing: border-box;
+    }
+
+    .toggle-switch-inner:before {
+      content: "開";
+      background-color: #28a745;
+      padding-left: 15px;
+      /* 修改點：讓文字從左側對齊並內縮 */
+      text-align: left;
+    }
+
+    .toggle-switch-inner:after {
+      content: "關";
+      background-color: #ccc;
+      padding-right: 15px;
+      /* 修改點：讓文字從右側對齊並內縮 */
+      text-align: right;
+    }
+
+    #themeToggleSwitch+.toggle-switch-label .toggle-switch-inner:before {
+      content: attr(data-on);
+      background-color: #bb86fc;
+      color: white;
+      padding-left: 15px;
+      /* 修改點：讓「深色」文字從左側對齊並內縮 */
+      text-align: left;
+    }
+
+    #themeToggleSwitch+.toggle-switch-label .toggle-switch-inner:after {
+      content: attr(data-off);
+      background-color: #ccc;
+      color: #333;
+      padding-right: 15px;
+      /* 修改點：讓「淺色」文字從右側對齊並內縮 */
+      text-align: right;
+    }
+
+    body.dark-mode #themeToggleSwitch+.toggle-switch-label .toggle-switch-inner:after {
+      background-color: #555;
+      color: #fff;
+    }
+
+    .toggle-switch-checkbox:checked+.toggle-switch-label .toggle-switch-switch {
+      margin-left: 0;
+    }
+
+    .toggle-switch-switch {
+      display: block;
+      width: 32px;
+      height: 32px;
+      background: #fff;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      border-radius: 50%;
+      transition: left 0.3s ease;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch-checkbox:checked+.toggle-switch-label .toggle-switch-switch {
+      left: calc(100% - 32px - 4px);
+    }
+
+    .toggle-switch-checkbox:disabled+.toggle-switch-label {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #todayBtn {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 999;
+      padding: 0.8em 1.2em;
+      font-size: 1em;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-prompt-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 10002;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      pointer-events: none;
+    }
+
+    .custom-prompt-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .custom-prompt {
+      background-color: #333;
+      color: white;
+      padding: 25px 35px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      font-size: 1.1em;
+      text-align: center;
+      width: clamp(300px, 90vw, 500px);
+      box-sizing: border-box;
+      transform: scale(0.9);
+      transition: transform 0.3s ease-in-out;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .custom-prompt-overlay.visible .custom-prompt {
+      transform: scale(1);
+    }
+
+    body.dark-mode .custom-prompt {
+      background-color: #2c2c2c;
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
+    }
+
+    .custom-prompt button {
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    #customInstallPrompt img {
+      height: 1.2em;
+      vertical-align: middle;
+      filter: invert(1);
+      margin: 0 0.2em;
+      display: inline-block;
+    }
+
+    #customInstallPrompt #customInstallAppButton {
+      background-color: #5a4fcf;
+      color: white;
+    }
+
+    #customInstallPrompt #customInstallAppButton:hover {
+      background-color: #483dbb;
+    }
+
+    #customInstallPrompt #iosDismissButton {
+      background-color: transparent;
+      color: #bbb;
+      border: 1px solid #bbb;
+    }
+
+    #customInstallPrompt #iosDismissButton:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .custom-prompt .close-button {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 1.5em;
+      padding: 0 5px;
+      line-height: 1;
+      border: none;
+      background-color: transparent;
+      color: #bbb;
+    }
+
+    .custom-prompt .close-button:hover {
+      color: #f0f0f0;
+      background-color: transparent;
+    }
+
+    #notificationConfirmationModal #confirmEnableNotificationsButton {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #notificationConfirmationModal #confirmEnableNotificationsButton:hover {
+      background-color: #218838;
+    }
+
+    #notificationConfirmationModal #cancelEnableNotificationsButton {
+      background-color: #ccc;
+      color: #333;
+    }
+
+    body.dark-mode #notificationConfirmationModal #cancelEnableNotificationsButton {
+      background-color: #555;
+      color: #fff;
+    }
+
+    #notificationConfirmationModal #cancelEnableNotificationsButton:hover {
+      background-color: #bbb;
+    }
+
+    body.dark-mode #notificationConfirmationModal #cancelEnableNotificationsButton:hover {
+      background-color: #666;
+    }
+
+    #permissionDeniedModal #permissionDeniedCloseButton {
+      background-color: #5a4fcf;
+      color: white;
+    }
+
+    #permissionDeniedModal #permissionDeniedCloseButton:hover {
+      background-color: #483dbb;
+    }
+
+    #customConfirmModal #customConfirmOkButton,
+    #customAlertModal #customAlertOkButton {
+      background-color: #5a4fcf;
+      color: white;
+    }
+
+    #customConfirmModal #customConfirmOkButton:hover,
+    #customAlertModal #customAlertOkButton:hover {
+      background-color: #483dbb;
+    }
+
+    #customConfirmModal #customConfirmCancelButton {
+      background-color: #ccc;
+      color: #333;
+    }
+
+    body.dark-mode #customConfirmModal #customConfirmCancelButton {
+      background-color: #555;
+      color: #fff;
+    }
+
+    #customConfirmModal #customConfirmCancelButton:hover {
+      background-color: #bbb;
+    }
+
+    body.dark-mode #customConfirmModal #customConfirmCancelButton:hover {
+      background-color: #666;
+    }
+
+    /* ==== CSS Grid 佈局樣式 ==== */
+    #app-content {
+      margin-top: 1rem;
+    }
+
+    #content {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+      grid-auto-rows: min-content;
+      grid-auto-flow: dense;
+      align-items: start;
+    }
+
+    @media (min-width: 701px) {
+      #content {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      #content {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    @media (min-width: 1400px) {
+      #content {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+    }
+
+    body.layout-1-col #content {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+    }
+
+    body.layout-2-col #content {
+      @media (min-width: 701px) {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2rem !important;
+      }
+    }
+
+    body.layout-3-col #content {
+      @media (min-width: 1025px) {
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 2rem !important;
+      }
+
+      @media (min-width: 701px) and (max-width: 1024px) {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2rem !important;
+      }
+    }
+
+    body.layout-4-col #content {
+      @media (min-width: 1400px) {
+        grid-template-columns: 1fr 1fr 1fr 1fr !important;
+        gap: 2rem !important;
+      }
+
+      @media (min-width: 1025px) and (max-width: 1399px) {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2rem !important;
+      }
+
+      @media (min-width: 701px) and (max-width: 1024px) {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2rem !important;
+      }
+    }
+
+    @media (max-width: 700px) {
+
+      body.layout-1-col #content,
+      body.layout-2-col #content,
+      body.layout-3-col #content,
+      body.layout-4-col #content {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+      }
+    }
+
+    .layout-options {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      width: 100%;
+    }
+
+    .layout-option-btn {
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      color: #333;
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+      flex-grow: 1;
+      min-width: 60px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .layout-option-btn:hover {
+      background-color: #e5e5e5;
+      border-color: #ccc;
+    }
+
+    .layout-option-btn.active {
+      background-color: #5a4fcf;
+      color: white;
+      border-color: #5a4fcf;
+      font-weight: bold;
+    }
+
+    body.dark-mode .layout-option-btn {
+      background-color: #3c3c3c;
+      color: #eee;
+      border-color: #555;
+    }
+
+    body.dark-mode .layout-option-btn:hover {
+      background-color: #4a4a4a;
+    }
+
+    body.dark-mode .layout-option-btn.active {
+      background-color: #bb86fc;
+      color: #121212;
+      border-color: #bb86fc;
+    }
+
+    /* 添加翻譯控制相關樣式 */
+    .translation-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1em;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .translation-controls select,
+    .translation-controls button {
+      padding: 0.6em 1.2em;
+      font-size: 0.95em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .translation-controls button:hover {
+      background-color: #e5e5e5;
+    }
+
+    .translation-controls select {
+      flex-grow: 1;
+      max-width: 200px;
+    }
+
+    .translation-controls button.active {
+      background-color: #5a4fcf;
+      color: white;
+      border-color: #5a4fcf;
+    }
+
+    .translation-loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #5a4fcf;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: none;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    body.dark-mode .translation-controls select,
+    body.dark-mode .translation-controls button {
+      background-color: #3c3c3c;
+      color: #eee;
+      border-color: #555;
+    }
+
+    body.dark-mode .translation-controls button:hover {
+      background-color: #4a4a4a;
+    }
+
+    body.dark-mode .translation-controls button.active {
+      background-color: #bb86fc;
+      color: #121212;
+      border-color: #bb86fc;
+    }
+
+    body.dark-mode .translation-loading-spinner {
+      border-top: 4px solid #bb86fc;
+    }
+
+    /* Preloader 樣式 */
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10004;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+
+    body.dark-mode #preloader {
+      background: #121212;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #5a4fcf;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    body.dark-mode .spinner {
+      border-top: 6px solid #bb86fc;
+    }
+
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- === 載入動畫 (Preloader) === -->
+  <div id="preloader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- === 頁面頭部 (Header) === -->
+  <header>
+    <h1>濟公報(測試版)<span class="subtitle">每日UTC+8 6:30更新</span></h1>
+
+    <!-- === 新增：主要功能按鈕區塊 === -->
+    <!-- 設定此容器為定位上下文，方便內部 share-popover 的 absolute 定位 -->
+    <div class="header-actions">
+      <!-- 新增分享按鈕 -->
+      <button id="main-share-btn" class="action-icon-btn" title="分享與安裝">
+        <img src="icons/share.png" alt="分享">
+      </button>
+      <!-- 原有的設定按鈕 -->
+      <button id="settings-btn" class="settings-button action-icon-btn" title="設定">
+        <img src="icons/settings.png" alt="設定"> <!-- 修改點：將設定圖示改為圖片形式 -->
+      </button>
+
+      <!-- === 新增：分享浮動面板 HTML 結構 === -->
+      <!-- 將 Popover 放置在 header-actions 內部，使其 right:0 定位到分享按鈕右側邊緣 -->
+      <div id="share-popover">
+        <img id="share-popover-qr" src="icons/濟公報QRcode.png" alt="濟公報 QR Code">
+        <pre id="share-text-content"></pre>
+        <button id="copy-share-text-btn">一鍵複製訊息</button>
+        <div class="social-share-links">
+          <!-- Line 圖標使用絕對路徑 -->
+          <a id="share-to-line" href="#" title="分享到 Line" target="_blank" rel="noopener noreferrer">
+            <img src="https://jigong-news-test.web.app/ICON/line.png" alt="Line">
+          </a>
+          <!-- Facebook 圖標使用絕對路徑 -->
+          <a id="share-to-facebook" href="#" title="分享到 Facebook" target="_blank" rel="noopener noreferrer">
+            <img src="https://jigong-news-test.web.app/ICON/facebook.png" alt="Facebook">
+          </a>
+          <!-- WhatsApp 圖標使用絕對路徑 -->
+          <a id="share-to-whatsapp" href="#" title="分享到 WhatsApp" target="_blank" rel="noopener noreferrer">
+            <img src="https://jigong-news-test.web.app/ICON/whatsapp.png" alt="WhatsApp">
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <button id="todayBtn" title="今日貼文">今日貼文</button>
+
+  <!-- === 主要應用程式內容區塊 === -->
+  <main id="app-content">
+    <div class="input-row">
+      <input id="search" type="text" placeholder="搜尋內容..." />
+      <input id="datePicker" type="text" placeholder="選擇日期..." readonly />
+      <button id="resetBtn" class="reset-btn" title="重設篩選">↻</button>
+    </div>
+    <div id="content"></div>
+    <button id="loadMoreBtn">顯示更多</button>
+  </main>
+
+  <div class="overlay"></div>
+
+  <!-- === 設定面板 HTML === -->
+  <div id="settings-panel" class="settings-panel">
+    <div class="settings-header">
+      <h2>設定</h2> <button id="close-settings-btn" class="close-button" title="關閉設定">×</button>
+    </div>
+    <div class="settings-content">
+      <div class="setting-item"> <label for="notificationToggle">推播通知</label>
+        <div class="toggle-switch"> <input type="checkbox" id="notificationToggle" class="toggle-switch-checkbox"
+            disabled> <label for="notificationToggle" class="toggle-switch-label"> <span
+              class="toggle-switch-inner"></span> <span class="toggle-switch-switch"></span> </label> </div>
+      </div>
+      <div class="setting-item"> <label for="themeToggleSwitch">系統背景</label>
+        <div class="toggle-switch"> <input type="checkbox" id="themeToggleSwitch" class="toggle-switch-checkbox"> <label
+            for="themeToggleSwitch" class="toggle-switch-label" data-on="深色" data-off="淺色"> <span
+              class="toggle-switch-inner"></span> <span class="toggle-switch-switch"></span> </label> </div>
+      </div>
+      <div class="setting-item"> <label>排版方式</label>
+        <div id="layout-options" class="layout-options"> <button class="layout-option-btn"
+            data-layout="layout-1-col">一欄</button> <button class="layout-option-btn"
+            data-layout="layout-2-col">兩欄</button> <button class="layout-option-btn"
+            data-layout="layout-3-col">三欄</button> <button class="layout-option-btn"
+            data-layout="layout-4-col">四欄</button> </div>
+      </div>
+      <div class="setting-item"> <label>清除網站緩存</label> <button id="clear-cache-btn" class="action-button"
+          title="清除網站緩存">立即清除</button> </div>
+    </div>
+  </div>
+
+  <!-- === 圖片放大模態視窗 (Modal) === -->
+  <div id="imageModal">
+    <button id="modalCloseBtn" title="關閉">×</button>
+    <button id="modalPrevBtn" class="modal-nav-btn" title="上一張"> <svg width="24" height="24" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg> </button>
+    <img alt="放大圖片" id="modalImage">
+    <button id="modalNextBtn" class="modal-nav-btn" title="下一張"> <svg width="24" height="24" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg> </button>
+    <div id="shareButtonsContainer"></div>
+  </div>
+
+  <!-- === PWA 自定義安裝提示覆蓋層 === -->
+  <div id="customInstallPromptOverlay" class="custom-prompt-overlay"></div>
+  <!-- === 自定義推播通知確認模態框 === -->
+  <div id="notificationConfirmationModalOverlay" class="custom-prompt-overlay">
+    <div id="notificationConfirmationModal" class="custom-prompt">
+      <p style="margin: 0; font-weight: bold;">開啟推播通知</p>
+      <p style="margin: 0; font-size: 0.95em; opacity: 0.9;"> 您確定要開啟濟公報的每日更新推播通知嗎？ </p>
+      <p style="margin: 0; font-size: 0.85em; opacity: 0.7;">（稍後會彈出瀏覽器權限請求）</p>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;"> <button
+          id="confirmEnableNotificationsButton">開啟通知</button> <button id="cancelEnableNotificationsButton">取消</button>
+      </div> <button id="notificationConfirmationCloseXButton" class="close-button">×</button>
+    </div>
+  </div>
+  <!-- === 自定義權限被拒絕指導模態框 === -->
+  <div id="permissionDeniedModalOverlay" class="custom-prompt-overlay">
+    <div id="permissionDeniedModal" class="custom-prompt">
+      <p style="margin: 0; font-weight: bold;">通知權限被拒絕</p>
+      <p style="margin: 0; font-size: 0.95em; opacity: 0.9;"> 您已關閉或拒絕了瀏覽器的通知權限。 </p>
+      <p style="margin: 0; font-size: 0.85em; opacity: 0.7;"> 請前往您**瀏覽器的設定**，手動允許「濟公報」網站發送通知。 </p>
+      <p style="margin: 0; font-size: 0.8em; opacity: 0.6;">（例如：Chrome瀏覽器設定 -> 隱私權與安全性 -> 網站設定 -> 通知）</p>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;"> <button
+          id="permissionDeniedCloseButton">我知道了</button> </div> <button id="permissionDeniedCloseXButton"
+        class="close-button">×</button>
+    </div>
+  </div>
+  <!-- === 通用確認模態框 === -->
+  <div id="customConfirmModalOverlay" class="custom-prompt-overlay">
+    <div id="customConfirmModal" class="custom-prompt">
+      <p id="customConfirmMessage" style="margin: 0; font-weight: bold;"></p>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;"> <button
+          id="customConfirmOkButton">確定</button> <button id="customConfirmCancelButton">取消</button> </div>
+    </div>
+  </div>
+  <!-- === 通用提示模態框 === -->
+  <div id="customAlertModalOverlay" class="custom-prompt-overlay">
+    <div id="customAlertModal" class="custom-prompt">
+      <p id="customAlertMessage" style="margin: 0;"></p>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;"> <button
+          id="customAlertOkButton">我知道了</button> </div>
+    </div>
+  </div>
+
+
+  <!-- === 外部 JavaScript 函式庫載入 === -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
+  <script src="./zh-tw.js"></script>
+  <script src="pwa-notifications.js" defer></script>
+
+  <!-- === 主要應用程式邏輯 JavaScript === -->
+  <script type="module">
+    // --- Firebase SDKs 載入與配置 ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyCmtADX2P6QSxKh2oqyfXYgNy6oLw0C7iw", authDomain: "jigong-news-test.firebaseapp.com", projectId: "jigong-news-test", storageBucket: "jigong-news-test.firebasestorage.app", messagingSenderId: "512806994042", appId: "1:512806994042:web:7105954a3a32a2edde3bc3", measurementId: "G-5NV53SWK53" };
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // --- 工具函式 ---
+    const PWA_SUB_PATH = '';
+    function getImageUrl(imagePath) {
+      if (!imagePath) return "";
+      if (!/^https?:\/\//i.test(imagePath)) {
+        const PWA_BASE_URL = window.location.origin + PWA_SUB_PATH;
+        return new URL(imagePath.replace(/\\/g, '/').replace(/^\//, ''), PWA_BASE_URL).href;
+      }
+      return imagePath.replace(/\\/g, '/');
+    }
+
+    /**
+     * 嘗試執行將圖片複製到剪貼簿的原生操作。
+     * @param {string} imageUrl - 要複製的圖片 URL。
+     * @returns {Promise<boolean>} 表示操作是否成功。
+     */
+    async function performClipboardCopy(imageUrl) {
+      try {
+        const response = await fetch(imageUrl);
+        if (!response.ok) throw new Error('Failed to fetch image for clipboard copy.');
+        const blob = await response.blob();
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type || 'image/png']: blob })]);
+        console.log('Image copied to clipboard successfully!');
+        return true;
+      } catch (error) {
+        console.error('Failed to copy image to clipboard directly:', error);
+        throw error;
+      }
+    }
+
+    /**
+     * 處理「複製圖片」按鈕點擊事件的入口函數，會先檢查權限或彈出確認視窗。
+     * @param {string} imageUrl - 要複製的圖片 URL。
+     * @param {HTMLElement} btn - 觸發操作的按鈕元素。
+     */
+    async function handleCopyImageAction(imageUrl, btn) {
+      const originalBtnHtml = btn.innerHTML;
+      if (!navigator.clipboard || !navigator.clipboard.write) {
+        if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('您的瀏覽器不支援直接複製圖片。<br>您可以「長按圖片」來儲存它。'); } else { alert('您的瀏覽器不支援直接複製圖片。您可以長按圖片來儲存它。'); }
+        return;
+      }
+      let permissionState = 'unknown';
+      try {
+        const permissionStatus = await navigator.permissions.query({ name: 'clipboard-write' });
+        permissionState = permissionStatus.state;
+      } catch (error) {
+        console.warn('查詢剪貼簿權限時發生錯誤或不支援 Permissions API:', error);
+        permissionState = 'prompt';
+      }
+      switch (permissionState) {
+        case 'granted':
+          try {
+            await performClipboardCopy(imageUrl);
+            if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('圖片已複製到剪貼簿！'); }
+            btn.innerHTML = `<img src="${getImageUrl('ICON/check.png')}" alt="已完成" class="share-btn-icon" style="filter: brightness(2);"> 已複製`;
+            setTimeout(() => { if (btn.parentNode) btn.innerHTML = originalBtnHtml; }, 2000);
+          } catch (copyError) {
+            console.error('已授予權限但複製失敗:', copyError);
+            if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('無法自動複製圖片到剪貼簿。<br>您可以「長按圖片」來儲存它。'); } else { alert('無法自動複製圖片到剪貼簿。您可以長按圖片來儲存它。'); }
+          }
+          break;
+        case 'prompt':
+        case 'unknown':
+          const confirmedViaCustomPrompt = await window.showCustomConfirm('將嘗試複製圖片到您的剪貼簿。<br>為了執行此操作，瀏覽器會彈出「剪貼簿權限請求」，請點擊「確定」或「允許」來授權。');
+          if (confirmedViaCustomPrompt) {
+            try {
+              await performClipboardCopy(imageUrl);
+              if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('圖片已複製到剪貼簿！'); }
+              btn.innerHTML = `<img src="${getImageUrl('ICON/check.png')}" alt="已完成" class="share-btn-icon" style="filter: brightness(2);"> 已複製`;
+              setTimeout(() => { if (btn.parentNode) btn.innerHTML = originalBtnHtml; }, 2000);
+            } catch (copyError) {
+              if (copyError.name === 'NotAllowedError') {
+                console.warn('Clipboard write permission denied by user (native prompt):', copyError);
+                if (typeof window.showPermissionDeniedModal === 'function') {
+                  window.showPermissionDeniedModal("複製權限被拒絕", "您已關閉或拒絕了瀏覽器的剪貼簿寫入權限。<br>請前往您的**瀏覽器設定**，手動允許「濟公報」複製圖片。<br><small>(例如: Chrome瀏覽器設定 -> 隱私權與安全性 -> 網站設定 -> 剪貼簿)</small>");
+                } else { alert("複製權限被拒絕。請前往瀏覽器設定手動允許此網站複製內容。"); }
+              } else {
+                console.error('Failed to copy image after user confirmation:', copyError);
+                if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('無法自動複製圖片到剪貼簿。<br>您可以「長按圖片」來儲存它。'); } else { alert('無法自動複製圖片到剪貼簿。您可以長按圖片來儲存它。'); }
+              }
+            }
+          } else {
+            if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('複製操作已取消。'); } else { alert('複製操作已取消。'); }
+          }
+          break;
+        case 'denied':
+          if (typeof window.showPermissionDeniedModal === 'function') {
+            window.showPermissionDeniedModal("複製權限被拒絕", "您已關閉或拒絕了瀏覽器的剪貼簿寫入權限。<br>請前往您的**瀏覽器設定**，手動允許「濟公報」複製圖片。<br><small>(例如: Chrome瀏覽器設定 -> 隱私權與安全性 -> 網站設定 -> 剪貼簿)</small>");
+          } else { alert("複製權限被拒絕。請前往瀏覽器設定手動允許此網站複製內容。"); }
+          break;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+      // === DOM 元素快取 ===
+      const contentContainer = document.getElementById("content");
+      const searchInput = document.getElementById("search");
+      const datePickerInput = document.getElementById("datePicker");
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const todayBtn = document.getElementById("todayBtn");
+      const imageModal = document.getElementById("imageModal");
+      const modalImage = document.getElementById("modalImage");
+      const modalCloseBtn = document.getElementById("modalCloseBtn");
+      const modalPrevBtn = document.getElementById("modalPrevBtn");
+      const modalNextBtn = document.getElementById("modalNextBtn");
+      const shareButtonsContainer = document.getElementById("shareButtonsContainer");
+      const layoutOptionsContainer = document.getElementById('layout-options');
+      const layoutOptionButtons = layoutOptionsContainer.querySelectorAll('.layout-option-btn');
+
+      // ===== 新增：分享功能相關 DOM 元素 =====
+      const mainShareBtn = document.getElementById('main-share-btn');
+      const sharePopover = document.getElementById('share-popover');
+      const shareTextContentEl = document.getElementById('share-text-content');
+      const copyShareTextBtn = document.getElementById('copy-share-text-btn');
+      const shareToLineBtn = document.getElementById('share-to-line');
+      const shareToFacebookBtn = document.getElementById('share-to-facebook');
+      const shareToWhatsAppBtn = document.getElementById('share-to-whatsapp');
+
+
+      let allPosts = []; let filteredPosts = []; let datePickerInstance = null;
+      let renderIndex = 0; const batchSize = 12; let shareButtonsTimeout = null;
+      const shareButtonHideDelay = 3000; let modalNavButtonsTimeout = null;
+      const modalNavButtonHideDelay = 2000; let touchStartX = 0; let touchEndX = 0;
+      const swipeThreshold = 50;
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+      function renderBatch() { const postsToRender = filteredPosts.slice(renderIndex, renderIndex + batchSize); postsToRender.forEach(post => { const div = document.createElement("div"); div.className = "post"; const imgTag = post.image ? `<img src="${getImageUrl(post.image)}" alt="圖片" onerror="this.style.display='none';">` : ""; const displayTextForRender = (post.text || "").replace(/\n/g, "<br>"); div.innerHTML = `<div class="date">${post.date || ""}</div><div class="text"></div>${imgTag}`; const textElement = div.querySelector('.text'); if (textElement) { textElement.innerHTML = displayTextForRender; } contentContainer.appendChild(div); }); renderIndex += postsToRender.length; loadMoreBtn.style.display = renderIndex >= filteredPosts.length ? "none" : "block"; }
+      function render(posts) { contentContainer.innerHTML = ""; renderIndex = 0; renderBatch(); }
+      function getAllDates(posts) { return [...new Set(posts.map(post => post.date).filter(Boolean))].sort((a, b) => (b || "").localeCompare(a || "")); }
+
+      function fetchAndRender() {
+        const postsJsonUrl = isLocalhost ? './posts.json' : 'https://storage.googleapis.com/jigong-news-test.firebasestorage.app/posts.json';
+        const urlWithCacheBuster = isLocalhost ? `${postsJsonUrl}` : `${postsJsonUrl}?t=${new Date().getTime()}`;
+        console.log(`正在從 URL 獲取資料: ${urlWithCacheBuster}`);
+        fetch(urlWithCacheBuster)
+          .then(res => {
+            if (!res.ok) {
+              if (res.status === 403) { throw new Error("存取被拒絕 (403)。請檢查 Firebase Storage 的 CORS 規則以及檔案是否已設為公開。"); }
+              if (res.status === 404) { throw new Error("找不到文章資料庫 (404)。請確認 'posts.json' 已成功上傳至 Firebase Storage。"); }
+              throw new Error(`獲取資料時發生網路錯誤！狀態碼：${res.status}`);
+            }
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) { throw new TypeError(`收到的不是 JSON 格式！而是 ${contentType}`); }
+            return res.json();
+          })
+          .then(data => {
+            allPosts = data;
+            filteredPosts = allPosts;
+            render(filteredPosts);
+            if (datePickerInput && flatpickr) {
+              if (datePickerInstance) { datePickerInstance.destroy(); }
+              datePickerInstance = flatpickr(datePickerInput, {
+                dateFormat: "Y-m-d",
+                disableMobile: true,
+                locale: "zh_tw",
+                onChange: function () { filterAndRender(); },
+                enable: getAllDates(allPosts)
+              });
+            }
+          })
+          .catch(error => {
+            console.error("載入或處理文章時發生錯誤:", error);
+            contentContainer.innerHTML = `<p style="text-align: center; color: #888;">無法載入文章，請稍後再試。<br><small>${error.message}</small></p>`;
+          })
+          .finally(() => {
+            document.getElementById('preloader').classList.add('hidden');
+          });
+      }
+
+      function filterAndRender() { const keywordInput = searchInput.value.trim().toLowerCase(); const keywords = keywordInput.split(/\s+/).filter(Boolean); const date = datePickerInput.value.trim(); filteredPosts = allPosts.filter(post => { const postText = (post.text || "").toLowerCase(); const postDate = (post.date || ""); const matchText = keywords.length === 0 || keywords.every(kw => postText.includes(kw)); const matchDate = !date || postDate === date; return matchText && matchDate; }); render(filteredPosts); }
+
+      // === 事件監聽器註冊 ===
+      searchInput.addEventListener("input", filterAndRender);
+      loadMoreBtn.addEventListener("click", renderBatch);
+      resetBtn.addEventListener("click", function () { searchInput.value = ""; datePickerInput.value = ""; if (datePickerInstance) { datePickerInstance.clear(); } filterAndRender(); });
+      todayBtn.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+      // ===== 新增：分享浮動面板邏輯 =====
+      const shareText = `📢 歡迎安裝濟公報APP
+1️⃣ 點選網站聯結 🔗 https://lihi.cc/j5aBX
+2️⃣ 訂閱濟公報，安裝APP
+至手機 / 平板 / 電腦桌面
+3️⃣ 每天早上6點半
+📬收到濟公報更新通知！
+🧙‍♂️📜 一起天天接收仙佛的慈語與智慧！`;
+
+      if (shareTextContentEl) shareTextContentEl.textContent = shareText;
+
+      // 切換分享面板的顯示/隱藏
+      mainShareBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // 防止觸發 window 的點擊事件
+        sharePopover.classList.toggle('visible');
+      });
+
+      // 一鍵複製文字
+      copyShareTextBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(shareText).then(() => {
+          const originalText = copyShareTextBtn.textContent;
+          copyShareTextBtn.textContent = '已複製！';
+          copyShareTextBtn.classList.add('copied');
+          setTimeout(() => {
+            copyShareTextBtn.textContent = originalText;
+            copyShareTextBtn.classList.remove('copied');
+          }, 2000);
+        }).catch(err => {
+          console.error('複製失敗:', err);
+          if (typeof window.showCustomAlert === 'function') {
+            window.showCustomAlert('複製失敗，請手動選取文字複製。');
+          } else {
+            alert('複製失敗，請手動選取文字複製。');
+          }
+        });
+      });
+
+      // 設定社群分享連結
+      const encodedShareText = encodeURIComponent(shareText);
+      const siteUrl = 'https://jigong-news-test.web.app/'; // 或者您要分享的特定URL
+      shareToLineBtn.href = `https://line.me/R/msg/text/?${encodedShareText}`;
+      // 為 Facebook 分享連結添加 quote 參數，以預設分享文字
+      shareToFacebookBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}&quote=${encodedShareText}`;
+      shareToWhatsAppBtn.href = `https://api.whatsapp.com/send?text=${encodedShareText}`;
+
+
+      // 點擊面板外部時隱藏面板，並考慮到點擊按鈕本身不觸發關閉
+      window.addEventListener('click', (event) => {
+        // 如果面板可見，且點擊目標不是面板內部，也不是觸發按鈕本身
+        if (sharePopover.classList.contains('visible') && !sharePopover.contains(event.target) && event.target !== mainShareBtn && !mainShareBtn.contains(event.target)) {
+          sharePopover.classList.remove('visible');
+        }
+      });
+      // 按下 Esc 鍵時隱藏面板
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sharePopover.classList.contains('visible')) {
+          sharePopover.classList.remove('visible');
+        }
+      });
+
+
+      let imageList = []; let currentImageIndex = -1;
+      function updateImageList() { imageList = Array.from(contentContainer.querySelectorAll(".post img")).map(img => img.src); }
+      function showShareButtons() { if (shareButtonsContainer) { shareButtonsContainer.classList.add('visible'); clearTimeout(shareButtonsTimeout); shareButtonsTimeout = setTimeout(hideShareButtons, shareButtonHideDelay); } }
+      function hideShareButtons() { if (shareButtonsContainer) { shareButtonsContainer.classList.remove('visible'); } }
+      function showModalNavButtons() { if (modalPrevBtn && modalNextBtn && imageModal.style.display === "flex") { modalPrevBtn.classList.add('visible'); modalNextBtn.classList.add('visible'); clearTimeout(modalNavButtonsTimeout); modalNavButtonsTimeout = setTimeout(hideModalNavButtons, modalNavButtonHideDelay); } }
+      function hideModalNavButtons() { if (modalPrevBtn && modalNextBtn) { modalPrevBtn.classList.remove('visible'); modalNextBtn.classList.remove('visible'); } }
+      function generateShareButtons(imageUrl, postText = "") {
+        if (!shareButtonsContainer) return;
+        shareButtonsContainer.innerHTML = '';
+        const siteToShareUrl = "https://jigong-news-test.web.app/";
+        const encodedSiteToShareUrl = encodeURIComponent(siteToShareUrl);
+        // 使用原始的 shareText 做為通用備用文字
+        const commonShareText = shareText;
+
+        // 決定給 Line 使用的文本
+        const lineShareText = encodeURIComponent(`${postText ? postText.substring(0, 100) + (postText.length > 100 ? "..." : "") : document.title}\n${siteToShareUrl}`);
+
+        // 為 Facebook 分享連結決定要傳遞的文字 (優先使用 postText，其次使用 commonShareText)
+        const textForFacebookShare = postText ? postText.substring(0, 200) + (postText.length > 200 ? '...' : '') : commonShareText;
+
+        const shares = [
+          {
+            name: 'Facebook',
+            action: async (event) => {
+              event.stopPropagation();
+              showShareButtons();
+              await handleCopyImageAction(imageUrl, event.currentTarget);
+              // Facebook 分享 URL 中加入 quote 參數，使用決定好的 textForFacebookShare
+              const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedSiteToShareUrl}&quote=${encodeURIComponent(textForFacebookShare)}`;
+              window.open(fbShareUrl, '_blank', 'noopener,noreferrer');
+            },
+            icon: 'ICON/facebook.png'
+          },
+          {
+            name: 'Line',
+            action: async (event) => {
+              event.stopPropagation();
+              showShareButtons();
+              await handleCopyImageAction(imageUrl, event.currentTarget);
+              window.open(`line://msg/text/?${lineShareText}`, '_blank');
+            },
+            icon: 'ICON/line.png'
+          },
+          {
+            name: 'Instagram',
+            action: async (event) => {
+              event.stopPropagation();
+              showShareButtons();
+              await handleCopyImageAction(imageUrl, event.currentTarget);
+              if (typeof window.showCustomAlert === 'function') { window.showCustomAlert('圖片已複製！<br>請到 Instagram App 中貼上並分享。'); } else { alert('圖片已複製！請到 Instagram App 中貼上並分享。'); }
+            },
+            icon: 'ICON/instagram.png'
+          },
+          {
+            name: '複製圖片',
+            action: async (event) => {
+              event.stopPropagation();
+              showShareButtons();
+              const btn = event.currentTarget;
+              await handleCopyImageAction(imageUrl, btn);
+            },
+            icon: 'ICON/link.png'
+          }
+        ];
+        shares.forEach(share => {
+          const element = share.url ? document.createElement('a') : document.createElement('button');
+          const iconSrc = getImageUrl(share.icon);
+          element.innerHTML = `<img src="${iconSrc}" alt="${share.name}" class="share-btn-icon">`;
+          element.title = share.title || `分享到 ${share.name}`;
+          if (share.className) element.classList.add(share.className);
+          if (share.action) element.addEventListener('click', share.action);
+          shareButtonsContainer.appendChild(element);
+        });
+        showShareButtons();
+      }
+      function showModal(clickedImgSrc) { updateImageList(); const index = imageList.indexOf(clickedImgSrc); if (index === -1) return; currentImageIndex = index; modalImage.src = imageList[currentImageIndex]; imageModal.style.display = "flex"; document.body.style.overflow = 'hidden'; const originalPost = filteredPosts.find(p => getImageUrl(p.image) === modalImage.src); let postTextForShare = originalPost && originalPost.text ? originalPost.text : ""; generateShareButtons(modalImage.src, postTextForShare); showModalNavButtons(); }
+      function hideModal() { imageModal.style.display = "none"; document.body.style.overflow = 'auto'; currentImageIndex = -1; clearTimeout(shareButtonsTimeout); hideShareButtons(); clearTimeout(modalNavButtonsTimeout); hideModalNavButtons(); }
+      function navigateModalImage(direction) { if (currentImageIndex === -1 || imageList.length === 0) return; currentImageIndex += direction; if (currentImageIndex < 0) { currentImageIndex = imageList.length - 1; } else if (currentImageIndex >= imageList.length) { currentImageIndex = 0; } modalImage.src = imageList[currentImageIndex]; const originalPost = filteredPosts.find(p => getImageUrl(p.image) === modalImage.src); let postTextForShare = originalPost && originalPost.text ? originalPost.text : ""; generateShareButtons(modalImage.src, postTextForShare); showModalNavButtons(); }
+      contentContainer.addEventListener("click", function (e) { if (e.target.tagName === "IMG" && e.target.closest(".post")) { showModal(e.target.src); } });
+      if (imageModal) { imageModal.addEventListener('click', (event) => { if (event.target === imageModal) { hideModal(); } }); imageModal.addEventListener('mousemove', () => { if (imageModal.style.display === "flex") { showShareButtons(); showModalNavButtons(); } }); imageModal.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { touchStartX = e.touches[0].clientX; touchEndX = 0; } }, { passive: true }); imageModal.addEventListener('touchmove', (e) => { if (e.touches.length === 1) { touchEndX = e.touches[0].clientX; } }, { passive: true }); imageModal.addEventListener('touchend', () => { if (touchEndX === 0 || Math.abs(touchStartX - touchEndX) < swipeThreshold) { showShareButtons(); showModalNavButtons(); return; } if (touchEndX < touchStartX) { navigateModalImage(1); } else if (touchEndX > touchStartX) { navigateModalImage(-1); } touchStartX = 0; touchEndX = 0; }); }
+      if (modalImage) { modalImage.addEventListener('click', (e) => { e.stopPropagation(); showShareButtons(); showModalNavButtons(); }); }
+      if (modalCloseBtn) { modalCloseBtn.addEventListener('click', hideModal); }
+      if (modalPrevBtn) { modalPrevBtn.addEventListener('click', (e) => { e.stopPropagation(); navigateModalImage(-1); }); }
+      if (modalNextBtn) { modalNextBtn.addEventListener('click', (e) => { e.stopPropagation(); navigateModalImage(1); }); }
+      document.addEventListener("keydown", function (e) { const modalVisible = imageModal.style.display === "flex"; if (!modalVisible) return; if (e.key === "Escape") { hideModal(); } else if (e.key === "ArrowRight") { navigateModalImage(1); } else if (e.key === "ArrowLeft") { navigateModalImage(-1); } });
+
+      function applyLayoutPreference() { let preferredLayout = localStorage.getItem('preferredLayout') || 'layout-2-col'; document.body.classList.remove('layout-1-col', 'layout-2-col', 'layout-3-col', 'layout-4-col'); document.body.classList.add(preferredLayout); layoutOptionButtons.forEach(button => { if (button.dataset.layout === preferredLayout) { button.classList.add('active'); } else { button.classList.remove('active'); } }); }
+      layoutOptionsContainer.addEventListener('click', (event) => { const targetButton = event.target.closest('.layout-option-btn'); if (targetButton) { const selectedLayout = targetButton.dataset.layout; localStorage.setItem('preferredLayout', selectedLayout); applyLayoutPreference(); } });
+
+      applyLayoutPreference(); fetchAndRender();
+
+      const pwaDomElements = { settingsBtn: document.getElementById('settings-btn'), settingsPanel: document.getElementById('settings-panel'), closeSettingsBtn: document.getElementById('close-settings-btn'), notificationToggleSwitch: document.getElementById('notificationToggle'), notificationLabel: document.querySelector('label[for="notificationToggle"]'), themeToggleSwitch: document.getElementById('themeToggleSwitch'), clearCacheBtn: document.getElementById('clear-cache-btn'), overlay: document.querySelector('.overlay'), customInstallPromptOverlay: document.getElementById('customInstallPromptOverlay'), notificationConfirmationModalOverlay: document.getElementById('notificationConfirmationModalOverlay'), notificationConfirmationModal: document.getElementById('notificationConfirmationModal'), permissionDeniedModalOverlay: document.getElementById('permissionDeniedModalOverlay'), permissionDeniedModal: document.getElementById('permissionDeniedModal'), customConfirmModalOverlay: document.getElementById('customConfirmModalOverlay'), customConfirmModal: document.getElementById('customConfirmModal'), customAlertModalOverlay: document.getElementById('customAlertModalOverlay'), customAlertModal: document.getElementById('customAlertModal'), PWA_SUB_PATH: PWA_SUB_PATH };
+      if (typeof window.initializePwaLogic === 'function') { window.initializePwaLogic(pwaDomElements); } else { console.error("錯誤: 找不到 initializePwaLogic 函數。pwa-notifications.js 是否正確載入？"); }
+    });
+  </script>
+
+</body>
+<footer class="footer">
+  <p>Copyright © 2025 發一崇德台中道場</p>
+</footer>
+
+</html>
