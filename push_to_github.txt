@@ -1,0 +1,86 @@
+程式碼推送步驟 (包含移除敏感資訊)
+
+目標: 從 Git 歷史記錄中完全移除 service-account-key.json 和 my-sa-key.json 檔案，然後安全地將程式碼推送到 GitHub。
+
+警告: 以下操作會永久修改您的 commit 歷史記錄，請務必謹慎操作，並在執行前備份您的儲存庫。
+
+步驟 1: 找出包含敏感資訊的 Commit
+
+首先，您需要找出哪些 commit 包含了敏感檔案。使用以下指令：
+
+git log --oneline --name-only --all | grep service-account-key.json
+git log --oneline --name-only --all | grep my-sa-key.json
+
+這個指令會列出所有包含這些檔案的 commit 訊息。
+
+步驟 2: 使用 git filter-branch 移除敏感檔案
+
+使用 git filter-branch 指令重寫 commit 歷史記錄，移除包含敏感檔案的 commit。
+
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch service-account-key.json" \
+  --prune-empty --tag-name-filter cat -- --all
+
+git filter-branch --force --index-filter \
+  "git rm --cached --ignore-unmatch my-sa-key.json" \
+  --prune-empty --tag-name-filter cat -- --all
+
+這個指令會：
+
+*   --force: 強制執行 filter-branch。
+*   --index-filter: 對索引執行指定的指令。
+*   git rm --cached --ignore-unmatch <檔案名稱>: 從索引中移除指定的檔案 (如果存在)。
+*   --prune-empty: 移除空的 commit。
+*   --tag-name-filter cat: 保留 tag 名稱。
+*   -- --all: 對所有分支和 tag 執行操作。
+
+步驟 3: 確認已移除敏感檔案
+
+再次執行步驟 1 的指令，確認已成功移除敏感檔案。
+
+git log --oneline --name-only --all | grep service-account-key.json
+git log --oneline --name-only --all | grep my-sa-key.json
+
+如果沒有任何輸出，表示已成功移除。
+
+步驟 4: 清理 Git 垃圾
+
+執行以下指令清理 Git 垃圾：
+
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+
+步驟 5: 強制推送變更
+
+由於您修改了 commit 歷史記錄，因此需要強制推送變更。
+
+git push origin --all --force
+git push origin --tags --force
+
+警告： 強制推送會覆蓋遠端儲存庫的歷史記錄。請確保您是唯一在操作這個儲存庫，或者與團隊成員協調好。
+
+步驟 6: 通知團隊成員 (如果有的話)
+
+如果您與其他團隊成員協作，請通知他們您已修改 commit 歷史記錄，他們需要執行 git pull --rebase origin <分支名稱> 同步他們的本地儲存庫。
+
+步驟 7: 移除本地的敏感檔案
+
+如果您還沒有移除，請從本地專案中刪除 service-account-key.json 和 my-sa-key.json 檔案。
+
+步驟 8: 新增 .gitignore 檔案
+
+建立一個 .gitignore 檔案，並新增以下內容，防止再次提交敏感檔案：
+
+.gitignore
+
+# 忽略 Firebase 憑證檔案
+service-account-key.json
+my-sa-key.json
+
+步驟 9: 提交 .gitignore 檔案
+
+git add .gitignore
+git commit -m "feat: 新增 .gitignore，防止提交敏感檔案"
+git push origin main
+
+完成以上步驟後，您的程式碼應該已經安全地推送到 GitHub，且不包含任何敏感資訊。
